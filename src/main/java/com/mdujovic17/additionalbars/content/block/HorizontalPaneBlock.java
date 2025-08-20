@@ -52,8 +52,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class HorizontalPaneBlock extends SlabBlock implements Waterloggable, TooltipAppender
+public class HorizontalPaneBlock extends SlabBlock implements Waterloggable
 {
+
     protected ArrayList<BlockTypes> barsTypes = new ArrayList<>();
 
     public static final EnumProperty<SlabType> TYPE = Properties.SLAB_TYPE;
@@ -131,17 +132,14 @@ public class HorizontalPaneBlock extends SlabBlock implements Waterloggable, Too
         return 1.0F;
     }
 
-    @Override
-    public void appendTooltip(Item.TooltipContext context, Consumer<Text> textConsumer, TooltipType type, ComponentsAccess components) {
-        for ( BlockTypes types : barsTypes) {
-            textConsumer.accept(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
-        }
-    }
-
 //    @Override
 //    public void appendTooltip(ItemStack stack, Item.TooltipContext options, List<Text> tooltip, TooltipType type) {
 //        for ( BlockTypes types : barsTypes) {
 //            tooltip.add(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
 //        }
 //    }
+
+    public ArrayList<BlockTypes> getBarsTypes() {
+        return barsTypes;
+    }
 }
