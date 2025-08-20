@@ -8,12 +8,13 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.block.Block;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.data.*;
+import net.minecraft.client.render.model.json.MultipartModelConditionBuilder;
+import net.minecraft.client.render.model.json.WeightedVariant;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +74,7 @@ public class AdditionalBarsModelGenerator extends FabricModelProvider {
             textures.put(TextureKey.TEXTURE, getTexture(id));
 
             if (id.contains("horizontal")) {
-                VariantsBlockStateSupplier supplier = createHorizontalBlockStateSupplier(blockEntry.getKey(), id);
+                BlockModelDefinitionCreator supplier = createHorizontalBlockStateSupplier(blockEntry.getKey(), id);
 
                 if (id.contains("crossed")) {
                     HORIZONTAL_CROSSED_MODEL_BOTTOM.upload(blockEntry.getKey(), textures, blockStateModelGenerator.modelCollector);
@@ -96,7 +97,7 @@ public class AdditionalBarsModelGenerator extends FabricModelProvider {
             else {
                 //LOGGER.info(id);
 
-                MultipartBlockStateSupplier supplier = createPaneBlockStateSupplier(blockEntry.getKey(), id);
+                MultipartBlockModelDefinitionCreator supplier = createPaneBlockStateSupplier(blockEntry.getKey(), id);
 
                 if (id.contains("crossed")) {
                     PANE_CROSSED_MODEL_POST.upload(blockEntry.getKey(), textures, blockStateModelGenerator.modelCollector);
@@ -172,46 +173,100 @@ public class AdditionalBarsModelGenerator extends FabricModelProvider {
         return new Model(Optional.of(Identifier.of(AdditionalBars.MODID, "item/" + parent)), Optional.empty(), requiredTextureKeys);
     }
 
-    private MultipartBlockStateSupplier createPaneBlockStateSupplier(Block block, String blockId) {
-        MultipartBlockStateSupplier supplier = MultipartBlockStateSupplier.create(block);
-        supplier.with(BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post_ends")));
+    private MultipartBlockModelDefinitionCreator createPaneBlockStateSupplier(Block block, String blockId) {
 
-        supplier.with(
-                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, false),
-                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post")));
+        WeightedVariant barsPostEnds = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post_ends"));
+        WeightedVariant barsPost = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post"));
+        WeightedVariant barsCap = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap"));
+        WeightedVariant barsCapAlt = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap_alt"));
+        WeightedVariant barsSide = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side"));
+        WeightedVariant barsSideAlt = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side_alt"));
 
-        supplier.with(
-                When.create().set(Properties.NORTH, true).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, false),
-                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap")));
-
-        supplier.with(
-                When.create().set(Properties.NORTH, false).set(Properties.EAST, true).set(Properties.SOUTH, false).set(Properties.WEST, false),
-                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
-
-        supplier.with(
-                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, true).set(Properties.WEST, false),
-                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap_alt")));
-
-        supplier.with(
-                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, true),
-                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap_alt")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
-
-        supplier.with(When.create().set(Properties.NORTH, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side")));
-        supplier.with(When.create().set(Properties.EAST, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
-        supplier.with(When.create().set(Properties.SOUTH, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side_alt")));
-        supplier.with(When.create().set(Properties.WEST, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side_alt")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
-
-        return supplier;
+        return MultipartBlockModelDefinitionCreator.create(block)
+                .with(barsPostEnds)
+                .with(new MultipartModelConditionBuilder()
+                        .put(Properties.NORTH, false)
+                        .put(Properties.EAST, false)
+                        .put(Properties.SOUTH, false)
+                        .put(Properties.WEST, false)
+                        .build(), barsPost)
+                .with(new MultipartModelConditionBuilder()
+                        .put(Properties.NORTH, true)
+                        .put(Properties.EAST, false)
+                        .put(Properties.SOUTH, false)
+                        .put(Properties.WEST, false)
+                        .build(), barsCap)
+                .with(new MultipartModelConditionBuilder()
+                        .put(Properties.NORTH, false)
+                        .put(Properties.EAST, true)
+                        .put(Properties.SOUTH, false)
+                        .put(Properties.WEST, false)
+                        .build(), barsCap.apply(BlockStateModelGenerator.ROTATE_Y_90))
+                .with(new MultipartModelConditionBuilder()
+                        .put(Properties.NORTH, false)
+                        .put(Properties.EAST, false)
+                        .put(Properties.SOUTH, true)
+                        .put(Properties.WEST, false)
+                        .build(), barsCapAlt)
+                .with(new MultipartModelConditionBuilder()
+                        .put(Properties.NORTH, false)
+                        .put(Properties.EAST, false)
+                        .put(Properties.SOUTH, false)
+                        .put(Properties.WEST, true)
+                        .build(), barsCapAlt.apply(BlockStateModelGenerator.ROTATE_Y_90))
+                .with(new MultipartModelConditionBuilder().put(Properties.NORTH, true), barsSide)
+                .with(new MultipartModelConditionBuilder().put(Properties.EAST, true), barsSide.apply(BlockStateModelGenerator.ROTATE_Y_90))
+                .with(new MultipartModelConditionBuilder().put(Properties.SOUTH, true), barsSideAlt)
+                .with(new MultipartModelConditionBuilder().put(Properties.WEST, true), barsSideAlt.apply(BlockStateModelGenerator.ROTATE_Y_90));
+//        MultipartBlockStateSupplier supplier = MultipartBlockStateSupplier.create(block);
+//        supplier.with(BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post_ends")));
+//
+//        supplier.with(
+//                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, false),
+//                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_post")));
+//
+//        supplier.with(
+//                When.create().set(Properties.NORTH, true).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, false),
+//                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap")));
+//
+//        supplier.with(
+//                When.create().set(Properties.NORTH, false).set(Properties.EAST, true).set(Properties.SOUTH, false).set(Properties.WEST, false),
+//                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
+//
+//        supplier.with(
+//                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, true).set(Properties.WEST, false),
+//                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap_alt")));
+//
+//        supplier.with(
+//                When.create().set(Properties.NORTH, false).set(Properties.EAST, false).set(Properties.SOUTH, false).set(Properties.WEST, true),
+//                BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_cap_alt")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
+//
+//        supplier.with(When.create().set(Properties.NORTH, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side")));
+//        supplier.with(When.create().set(Properties.EAST, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
+//        supplier.with(When.create().set(Properties.SOUTH, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side_alt")));
+//        supplier.with(When.create().set(Properties.WEST, true), BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_side_alt")).put(VariantSettings.Y, VariantSettings.Rotation.R90));
+//
+//        return supplier;
     }
 
-    private VariantsBlockStateSupplier createHorizontalBlockStateSupplier(Block block, String blockId) {
+    private BlockModelDefinitionCreator createHorizontalBlockStateSupplier(Block block, String blockId) {
 
-        return VariantsBlockStateSupplier.create(block, BlockStateVariant.create()
-                .put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, blockId)))
-                .coordinate(BlockStateVariantMap.create(HorizontalPaneBlock.TYPE)
-                        .register(SlabType.DOUBLE, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_combined")))
-                        .register(SlabType.TOP, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_top")))
-                        .register(SlabType.BOTTOM, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId))));
+        WeightedVariant horizontalPaneCombinedModel = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_combined"));
+        WeightedVariant horizontalPaneBottomModel = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId));
+        WeightedVariant horizontalPaneTopModel = BlockStateModelGenerator.createWeightedVariant(Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_top"));
+
+        return VariantsBlockModelDefinitionCreator.of(block)
+                .with(BlockStateVariantMap.models(HorizontalPaneBlock.TYPE)
+                        .register(SlabType.DOUBLE, horizontalPaneCombinedModel)
+                        .register(SlabType.BOTTOM, horizontalPaneBottomModel)
+                        .register(SlabType.TOP, horizontalPaneTopModel)
+                );
+//        return VariantsBlockStateSupplier.create(block, BlockStateVariant.create()
+//                .put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, blockId)))
+//                .coordinate(BlockStateVariantMap.create(HorizontalPaneBlock.TYPE)
+//                        .register(SlabType.DOUBLE, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_combined")))
+//                        .register(SlabType.TOP, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId + "_top")))
+//                        .register(SlabType.BOTTOM, BlockStateVariant.create().put(VariantSettings.MODEL, Identifier.of(AdditionalBars.MODID, "block/" + blockId))));
     }
 
     private Identifier getTexture(String blockId) {

@@ -26,6 +26,7 @@ package com.mdujovic17.additionalbars.events;
 
 import com.google.common.collect.Maps;
 import com.mdujovic17.additionalbars.init.ModBlocks;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
