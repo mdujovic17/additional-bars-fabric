@@ -24,17 +24,24 @@ SOFTWARE.
 
 package com.mdujovic17.additionalbars.content.block;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.PaneBlock;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipAppender;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class BarsBlock extends PaneBlock {
+public class BarsBlock extends PaneBlock  {
 
     protected ArrayList<BlockTypes> barsTypes = new ArrayList<>();
 
@@ -47,10 +54,14 @@ public class BarsBlock extends PaneBlock {
         barsTypes.addAll(Arrays.stream(types).toList());
     }
 
-    @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext options, List<Text> tooltip, TooltipType type) {
-        for ( BlockTypes types : barsTypes) {
-            tooltip.add(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
-        }
+    //    @Override
+//    public void appendTooltip(ItemStack stack, Item.TooltipContext options, List<Text> tooltip, TooltipType type) {
+//        for ( BlockTypes types : barsTypes) {
+//            tooltip.add(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
+//        }
+//    }
+
+    public ArrayList<BlockTypes> getBarsTypes() {
+        return barsTypes;
     }
 }

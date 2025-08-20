@@ -28,11 +28,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipAppender;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
@@ -48,9 +50,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class HorizontalPaneBlock extends SlabBlock implements Waterloggable
 {
+
     protected ArrayList<BlockTypes> barsTypes = new ArrayList<>();
 
     public static final EnumProperty<SlabType> TYPE = Properties.SLAB_TYPE;
@@ -128,10 +132,14 @@ public class HorizontalPaneBlock extends SlabBlock implements Waterloggable
         return 1.0F;
     }
 
-    @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext options, List<Text> tooltip, TooltipType type) {
-        for ( BlockTypes types : barsTypes) {
-            tooltip.add(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
-        }
+//    @Override
+//    public void appendTooltip(ItemStack stack, Item.TooltipContext options, List<Text> tooltip, TooltipType type) {
+//        for ( BlockTypes types : barsTypes) {
+//            tooltip.add(Text.translatable(types.getText().getString()).formatted(types.getTextColor()));
+//        }
+//    }
+
+    public ArrayList<BlockTypes> getBarsTypes() {
+        return barsTypes;
     }
 }

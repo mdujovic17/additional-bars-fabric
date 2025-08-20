@@ -25,7 +25,11 @@ SOFTWARE.
 package com.mdujovic17.additionalbars.events;
 
 import com.google.common.collect.Maps;
+import com.mdujovic17.additionalbars.content.block.BarsBlock;
+import com.mdujovic17.additionalbars.content.block.BlockTypes;
+import com.mdujovic17.additionalbars.content.block.HorizontalPaneBlock;
 import com.mdujovic17.additionalbars.init.ModBlocks;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
@@ -64,6 +68,7 @@ public class ModRegistry {
         registerOxidationStates();
         registerWaxableStates();
         addItemsToItemGroups();
+        registerTooltips();
     }
 
     public static void clientSetup() {
@@ -212,6 +217,25 @@ public class ModRegistry {
         OxidizableBlocksRegistry.registerWaxableBlockPair(ModBlocks.HORIZONTAL_CROSSED_EXPOSED_COPPER_BARS, ModBlocks.WAXED_HORIZONTAL_CROSSED_EXPOSED_COPPER_BARS);
         OxidizableBlocksRegistry.registerWaxableBlockPair(ModBlocks.HORIZONTAL_CROSSED_WEATHERED_COPPER_BARS, ModBlocks.WAXED_HORIZONTAL_CROSSED_WEATHERED_COPPER_BARS);
         OxidizableBlocksRegistry.registerWaxableBlockPair(ModBlocks.HORIZONTAL_CROSSED_OXIDIZED_COPPER_BARS, ModBlocks.WAXED_HORIZONTAL_CROSSED_OXIDIZED_COPPER_BARS);
+    }
+
+    public static void registerTooltips() {
+        ItemTooltipCallback.EVENT.register(((itemStack, tooltipContext, tooltipType, list) -> {
+            for (BarsBlock block : ModBlocks.BARS_BLOCKS) {
+                if (itemStack.isOf(block.asItem())) {
+                    for (BlockTypes blockType : block.getBarsTypes()) {
+                        list.add(Text.translatable(blockType.getText().getString()).formatted(blockType.getTextColor()));
+                    }
+                }
+            }
+            for (HorizontalPaneBlock block : ModBlocks.HORIZONTAL_BARS_BLOCKS) {
+                if (itemStack.isOf(block.asItem())) {
+                    for (BlockTypes blockType : block.getBarsTypes()) {
+                        list.add(Text.translatable(blockType.getText().getString()).formatted(blockType.getTextColor()));
+                    }
+                }
+            }
+        }));
     }
 
     public static void addItemsToItemGroups() {
